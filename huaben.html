@@ -129,6 +129,22 @@ let lastSpeaker = "";             // 上下文承接
 
 const NAME_WHITELIST = new Set(["旁白","许七安","王捕头","捕快甲","捕快乙","小李"]);
 const NARRATION_VERBS = /(道|说|问|喝道|喃喃|喊|冷哼|揶揄|叹道|应道)/;
+// 把名字后面的修饰动词/语气清掉（例如“王捕头冷哼一声”→“王捕头”）
+const NAME_CLEAN_RE = /(冷哼一声|冷哼|淡淡|缓缓|沉声(?:道)?|沉吟|皱眉|揶揄|笑(?:道|着说)?|开口(?:道|说)?|问道|说道|道|说|问|喝道|喝问|叹道|应道)$/;
+function cleanName(n){
+  return String(n||"")
+    .replace(/[“”"『』【】]/g,"")
+    .replace(NAME_CLEAN_RE,"")
+    .replace(/[，。、“”"！？：:\s]+$/g,"")
+    .trim();
+}
+// 判断一个字符串“像不像人名”
+function isLikelyName(name){
+  if(!name) return false;
+  if(NAME_WHITELIST.has(name)) return true;
+  return name.length <= 4 && !NARRATION_VERBS.test(name);
+}
+
 const defaultPauseMap = {"？":300,"?":300,"！":320,"!":320,"。":220,".":220,"……":260};
 const MAX_NARR_CHARS = 150;
 
@@ -186,16 +202,21 @@ function parseToScript(text, alias){
     const s = raw.trim();
 
     // A) 复合形态：叙述里有人名 + 动词 + 冒号 + “引号台词”
-    let mA = s.match(/^(.*?)([^\s，。、“”"！？：:]{1,8}).{0,8}?(?:道|说|问|喝道|喃喃|喊|冷哼|揶揄)\s*[:：]\s*[“"](.+)[”"]\s*$/);
+    let mA = s.match(/^(.*?)([^\s，。、“”"！？：:]{1,8})[^“”"]{0,8}?(?:道|说|问|喝道|喃喃|喊|冷哼|揶揄)\s*[:：]\s*[“"](.+)[”"]\s*$/);
     if(mA){
       const before = mA[1].trim();
-      const name   = normalizeSpeaker(mA[2], alias);
+      let name     = cleanName(mA[2]);
       const quoted = mA[3].trim();
       if(before) out.push(narr(before));
-      splitAndPush(out, name, quoted);
-      addRole(name); lastSpeaker = name;
-      continue;
-    }
+      if(isLikelyName(name)){
+         splitAndPush(out, name, quoted);
+         addRole(name); lastSpeaker = name;
+      }else{
+         // 名字不可信，则不要硬判角色，按最近说话人或“路人”
+        splitAndPush(out, lastSpeaker || "路人", quoted);
+      }
+       continue;
+     }
 
     // B) 叙述 + “……”
     let mB = s.match(/^(.*?)[“"](.+)[”"]\s*$/);
@@ -255,14 +276,14 @@ function extractSpeakerFromQuoted(q, alias){
   // 形态1：姓名：台词
   let m = q.match(/^([^\s:：]{1,8})\s*[:：]\s*(.+)$/);
   if(m){
-    const name = normalizeSpeaker(m[1], alias);
-    return {speaker:name, text:m[2].trim()};
+    let name = cleanName(normalizeSpeaker(m[1], alias));
+    if(isLikelyName(name)) return {speaker:name, text:m[2].trim()};
   }
   // 形态2：姓名 + 叙述动词 + ： 台词
-  m = q.match(/^([^\s，。、“”"！？：:]{1,8}).{0,6}?(?:道|说|问|喝道|喃喃|喊|冷哼|揶揄)\s*[:：]\s*(.+)$/);
+  m = q.match(/^([^\s，。、“”"！？：:]{1,8})[^“”"]{0,6}?(?:道|说|问|喝道|喃喃|喊|冷哼|揶揄)\s*[:：]\s*(.+)$/);
   if(m){
-    const name = normalizeSpeaker(m[1], alias);
-    return {speaker:name, text:m[2].trim()};
+    let name = cleanName(normalizeSpeaker(m[1], alias));
+    if(isLikelyName(name)) return {speaker:name, text:m[2].trim()};
   }
   return null;
 }
@@ -273,6 +294,7 @@ function normalizeSpeaker(name, alias){
   name = String(name||"").replace(/[“”"『』【】]/g,"").trim();
   if(alias && alias[name]) return alias[name];
   if(name==="宁宴") return "许七安"; // 常见别名
+  name = cleanName(name);              // ← 新增：统一再清洗一次
   return name;
 }
 function endPause(s){
