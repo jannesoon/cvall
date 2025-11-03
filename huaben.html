@@ -6,17 +6,25 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
 :root{
-  --bg:#0b0d12; --panel:#111623; --panel2:#0e1422; --line:#1f2431; --line2:#28324a; --text:#e8ecf1; --muted:#9aa4b2;
+  /* 浅色主题变量 */
+  --bg:#f6f7fb; --panel:#ffffff; --panel2:#f2f4f8; --line:#e6e8ef; --line2:#d9dce6;
+  --text:#1f2430; --muted:#697386;
+  --role-narr:#eef2ff; --role-a:#e7f5ff; --role-b:#eaf7ef; --role-c:#f8e9f4; --role-d:#fff1e6;
+}
+:root[data-theme="dark"]{
+  /* 深色主题变量 */
+  --bg:#0b0d12; --panel:#111623; --panel2:#0e1422; --line:#1f2431; --line2:#28324a;
+  --text:#e8ecf1; --muted:#9aa4b2;
   --role-narr:#2b3347; --role-a:#253856; --role-b:#283a2f; --role-c:#3a2b3a; --role-d:#3b2f24;
 }
 *{ box-sizing:border-box }
 body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; color:var(--text); background:var(--bg) }
-header{ position:sticky; top:0; z-index:5; background:rgba(11,13,18,.8); backdrop-filter:blur(6px); border-bottom:1px solid var(--line) }
+header{ position:sticky; top:0; z-index:5; background:var(--panel2); border-bottom:1px solid var(--line) }
 .bar{ max-width:1280px; margin:0 auto; padding:12px 16px; display:flex; gap:12px; align-items:center }
-.btn{ background:#0e1422; border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:10px; cursor:pointer }
-.btn:hover{ border-color:#3851ff66 }
+.btn{ background:var(--panel); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:10px; cursor:pointer }
+.btn:hover{ border-color:#7aa2ff66 }
 .ghost{ background:transparent }
-.right{ margin-left:auto; display:flex; gap:8px; align-items:center }
+.right{ margin-left:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap }
 .muted{ color:var(--muted); font-size:12px }
 .wrap{ max-width:1280px; margin:0 auto; padding:16px; display:grid; grid-template-columns:280px 1fr; gap:16px }
 aside{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px }
@@ -24,30 +32,32 @@ main{ background:var(--panel); border:1px solid var(--line); border-radius:14px;
 h2{ margin:0 0 8px; font-size:16px }
 table{ width:100%; border-collapse:collapse }
 th,td{ border-bottom:1px solid var(--line2); padding:10px; font-size:14px; vertical-align:top }
-th{ position:sticky; top:0; background:#0e1422; z-index:2 }
+th{ position:sticky; top:0; background:var(--panel2); z-index:2 }
 .rownum{ width:56px; text-align:right; color:var(--muted) }
 .speaker{ width:130px }
 .text{ width:auto }
 .cell-ops{ width:420px }
 .small{ font-size:12px; color:var(--muted) }
 .rolelist th,.rolelist td{ border-bottom:1px dashed var(--line2); padding:8px 6px; font-size:13px }
-input[type="number"],select{ background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px }
-input[type="text"]{ width:100%; background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px }
-textarea{ width:100%; min-height:120px; background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:10px; padding:8px; font-family:ui-monospace,Menlo,Consolas,monospace }
-.color-narr{ background:var(--role-narr) }
-.color-a{ background:var(--role-a) }
-.color-b{ background:var(--role-b) }
-.color-c{ background:var(--role-c) }
-.color-d{ background:var(--role-d) }
-.toolbar{ padding:12px; border-bottom:1px solid var(--line2); display:flex; gap:8px; align-items:center }
+input[type="number"],select{ background:var(--panel2); color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px }
+input[type="text"]{ width:100%; background:var(--panel2); color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px }
+textarea{ width:100%; min-height:120px; background:var(--panel2); color:var(--text); border:1px solid var(--line2); border-radius:10px; padding:8px; font-family:ui-monospace,Menlo,Consolas,monospace }
+.color-narr{ background: var(--role-narr) }
+.color-a{ background: var(--role-a) }
+.color-b{ background: var(--role-b) }
+.color-c{ background: var(--role-c) }
+.color-d{ background: var(--role-d) }
+.toolbar{ padding:12px; border-bottom:1px solid var(--line2); display:flex; gap:8px; align-items:center; flex-wrap:wrap }
 .pill{ display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--line2); color:var(--muted); font-size:12px }
-a.link{ color:#9ec1ff; text-decoration:none }
+a.link{ color:#3b72ff; text-decoration:none }
 a.link:hover{ text-decoration:underline }
 .rowtools{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px }
-.tool{ padding:4px 8px; border:1px solid var(--line2); border-radius:8px; background:#0e1422; font-size:12px; cursor:pointer }
-.tool:hover{ border-color:#3851ff66 }
+.tool{ padding:4px 8px; border:1px solid var(--line2); border-radius:8px; background:var(--panel2); font-size:12px; cursor:pointer }
+.tool:hover{ border-color:#7aa2ff66 }
 .inline{ display:inline-flex; gap:6px; align-items:center }
 .addrole{ width:120px }
+.badge{ display:inline-block; padding:2px 6px; font-size:12px; border-radius:6px; color:#556; background:#eef1ff; border:1px solid #d9defa }
+:root[data-theme="dark"] .badge{ color:#cbd5ff; background:#1a203a; border-color:#2a3570 }
 </style>
 </head>
 <body>
@@ -61,13 +71,14 @@ a.link:hover{ text-decoration:underline }
       <button class="btn" id="parseBtn">自动画本</button>
       <button class="btn" id="saveJsonBtn">导出JSON</button>
       <button class="btn ghost" id="resetBtn">清空</button>
+      <button class="btn" id="themeBtn">切换深/浅色</button>
     </div>
   </div>
 </header>
 
 <div class="wrap">
   <aside>
-    <h2>角色列表</h2>
+    <h2>角色列表 <span class="badge" id="roleSum">—</span></h2>
     <table class="rolelist"><thead><tr><th>角色</th><th>段落数</th></tr></thead><tbody id="roleTbody"></tbody></table>
 
     <h2 style="margin-top:16px">管理角色</h2>
@@ -82,7 +93,7 @@ a.link:hover{ text-decoration:underline }
     <div class="small">把外号/称呼统一成同一角色名。</div>
 
     <h2 style="margin-top:16px">说明</h2>
-    <div class="small">问号300ms，叹号320ms，句号220ms；连续旁白自动合并。</div>
+    <div class="small">问号300ms，叹号320ms，句号220ms；连续旁白自动合并；未识别对白会承接上一个明确说话人。</div>
 
     <h2 style="margin-top:16px">导入示例</h2>
     <button class="btn" id="exampleBtn">载入示例文本</button>
@@ -111,14 +122,21 @@ a.link:hover{ text-decoration:underline }
 <script>
 /* ====== 状态与常量 ====== */
 const $  = s => document.querySelector(s);
-let rawText = "";            // 原始文本
-let items   = [];            // {speaker,text,style,pause,gain}
-let roleSet = new Set(["旁白"]);  // 角色集合，供下拉使用
+let rawText = "";                 // 原始文本
+let items   = [];                 // {speaker,text,style,pause,gain}
+let roleSet = new Set(["旁白"]);  // 角色集合
+let lastSpeaker = "";             // 上下文承接
 
 const NAME_WHITELIST = new Set(["旁白","许七安","王捕头","捕快甲","捕快乙","小李"]);
 const NARRATION_VERBS = /(道|说|问|喝道|喃喃|喊|冷哼|揶揄|叹道|应道)/;
-const defaultPauseMap = {"？":300,"?":300,"！":320,"!":320,"。":220,".":220};
+const defaultPauseMap = {"？":300,"?":300,"！":320,"!":320,"。":220,".":220,"……":260};
 const MAX_NARR_CHARS = 150;
+
+/* ====== 主题切换 ====== */
+$("#themeBtn").onclick = ()=>{
+  const root = document.documentElement;
+  root.dataset.theme = root.dataset.theme === "dark" ? "" : "dark";
+};
 
 /* ====== 顶部按钮 ====== */
 $("#fileInput").addEventListener("change", async e=>{
@@ -141,7 +159,7 @@ $("#saveJsonBtn").addEventListener("click", ()=>{
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `huaben_${Date.now()}.json`; a.click();
 });
 $("#resetBtn").addEventListener("click", ()=>{
-  rawText=""; items=[]; roleSet=new Set(["旁白"]);
+  rawText=""; items=[]; roleSet=new Set(["旁白"]); lastSpeaker="";
   $("#fileInput").value=""; $("#fileName").textContent="未选择文件"; $("#statInfo").textContent="—";
   renderAll();
 });
@@ -149,50 +167,71 @@ $("#exampleBtn").addEventListener("click", ()=>{
   rawText = `当许七安看到仵作的验尸报告后，又察觉出了一个疑点。
 耐着性子继续看，翻看完死者家人和仆人的供词，他闭上眼睛，梳理着思路。王捕头冷哼一声，揶揄道：“请问许捕快，凶手是何人，在何处？”
 “别急，头儿。”
-“许七安睁开眼：‘我在卷宗中看到，张宅外墙上留了脚印是吗，你借此推断，贼人翻墙逃走，那小妇人所言不假。’”
+“许七安睁开眼：我在卷宗中看到，张宅外墙上留了脚印是吗，你借此推断，贼人翻墙逃走，那小妇人所言不假。”
 王捕头：“有什么问题？”
-许七安：“脚印是朝外的，所以是逃离时留下的。”`;
+许七安：“脚印是朝外的，所以是逃离时留下的。”
+“因为脚底有泥。”
+“因为墙边是花圃。”
+“那么，卷宗上为什么没有进入院子的脚印？”`;
   $("#fileName").textContent="示例文本"; $("#statInfo").textContent="已载入示例，点击“自动画本”。";
 });
 
-/* ====== 解析（修复版） ====== */
+/* ====== 解析（强化版） ====== */
 function parseToScript(text, alias){
   const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
   const out = [];
+  lastSpeaker = "";
+
   for(const raw of lines){
     const s = raw.trim();
 
-    // 1) 引号优先：叙述 + “……”
-    let m = s.match(/^(.*?)[“"](.*)[”"]\s*$/);
-    if(m){
-      const before = m[1].trim();
-      let quoted = m[2].trim();
-
-      // 引号内再次抽“姓名：台词”或“姓名+叙述动词+：台词”
-      const ext = extractSpeakerFromQuoted(quoted, alias);
+    // A) 复合形态：叙述里有人名 + 动词 + 冒号 + “引号台词”
+    let mA = s.match(/^(.*?)([^\s，。、“”"！？：:]{1,8}).{0,8}?(?:道|说|问|喝道|喃喃|喊|冷哼|揶揄)\s*[:：]\s*[“"](.+)[”"]\s*$/);
+    if(mA){
+      const before = mA[1].trim();
+      const name   = normalizeSpeaker(mA[2], alias);
+      const quoted = mA[3].trim();
       if(before) out.push(narr(before));
-      if(ext){ splitAndPush(out, ext.speaker, ext.text); addRole(ext.speaker); }
-      else { splitAndPush(out, "", quoted); } // 仍未知说话人
+      splitAndPush(out, name, quoted);
+      addRole(name); lastSpeaker = name;
       continue;
     }
 
-    // 2) 严格“姓名：台词”（无引号且无叙述动词）
-    m = s.match(/^([^\s:：]{1,8})\s*[:：]\s*(.+)$/);
-    if(m){
-      const name = normalizeSpeaker(m[1], alias);
-      const after = m[2].trim();
+    // B) 叙述 + “……”
+    let mB = s.match(/^(.*?)[“"](.+)[”"]\s*$/);
+    if(mB){
+      const before = mB[1].trim();
+      let quoted   = mB[2].trim();
+      // 引号内尝试抽“姓名：台词”或“姓名+叙述动词+：台词”
+      const ext = extractSpeakerFromQuoted(quoted, alias);
+      if(before) out.push(narr(before));
+      if(ext){
+        splitAndPush(out, ext.speaker, ext.text);
+        addRole(ext.speaker); lastSpeaker = ext.speaker;
+      }else{
+        // 承接最近说话人
+        splitAndPush(out, lastSpeaker || "路人", quoted);
+      }
+      continue;
+    }
+
+    // C) “姓名：台词”（严格）
+    let mC = s.match(/^([^\s:：]{1,8})\s*[:：]\s*(.+)$/);
+    if(mC){
+      const name = normalizeSpeaker(mC[1], alias);
+      const after = mC[2].trim();
       const hasQuote = /[“”"]/.test(after);
       const hasVerb  = NARRATION_VERBS.test(s);
       if(!hasQuote && !hasVerb && (NAME_WHITELIST.has(name) || name==="旁白" || name.length<=4)){
         splitAndPush(out, name==="旁白"?"旁白":name, after);
-        addRole(name);
+        addRole(name); lastSpeaker = (name==="旁白") ? lastSpeaker : name;
       }else{
         out.push(narr(s));
       }
       continue;
     }
 
-    // 3) 其它 → 旁白
+    // D) 其它 → 旁白
     out.push(narr(s));
   }
 
@@ -217,10 +256,10 @@ function extractSpeakerFromQuoted(q, alias){
   let m = q.match(/^([^\s:：]{1,8})\s*[:：]\s*(.+)$/);
   if(m){
     const name = normalizeSpeaker(m[1], alias);
-    if(name!=="“" && name!=="”") return {speaker:name, text:m[2].trim()};
+    return {speaker:name, text:m[2].trim()};
   }
   // 形态2：姓名 + 叙述动词 + ： 台词
-  m = q.match(/^([^\s，。、“”"！？：:]{1,8}).{0,6}?(?:冷哼|揶揄|皱眉|点头|沉思|问|说|道|喝道)?\s*[:：]\s*[“"]?(.+?)[”"]?$/);
+  m = q.match(/^([^\s，。、“”"！？：:]{1,8}).{0,6}?(?:道|说|问|喝道|喃喃|喊|冷哼|揶揄)\s*[:：]\s*(.+)$/);
   if(m){
     const name = normalizeSpeaker(m[1], alias);
     return {speaker:name, text:m[2].trim()};
@@ -233,12 +272,20 @@ function parseAlias(s){ if(!s.trim()) return {}; try{ return JSON.parse(s); }cat
 function normalizeSpeaker(name, alias){
   name = String(name||"").replace(/[“”"『』【】]/g,"").trim();
   if(alias && alias[name]) return alias[name];
-  if(name==="宁宴") return "许七安";
+  if(name==="宁宴") return "许七安"; // 常见别名
   return name;
 }
-function endPause(s){ for(let i=s.length-1;i>=0;i--){ const ch=s[i]; if(defaultPauseMap[ch]!=null) return defaultPauseMap[ch]; } return 220; }
+function endPause(s){
+  // 找最后一个标点的默认停顿
+  for(let i=s.length-1;i>=0;i--){ const ch=s[i]; if(defaultPauseMap[ch]!=null) return defaultPauseMap[ch]; }
+  return 220;
+}
 function splitAndPush(out, speaker, content){
-  const parts = content.split(/([。！？!?])/).reduce((acc,cur,i,arr)=>{ if(i%2===0){ const p=(cur+(arr[i+1]||"")).trim(); if(p) acc.push(p); } return acc; },[]);
+  // 按句号/问号/叹号切；逗号不切，避免碎
+  const parts = content.split(/([。！？!?])/).reduce((acc,cur,i,arr)=>{
+    if(i%2===0){ const p=(cur+(arr[i+1]||"")).trim(); if(p) acc.push(p); }
+    return acc;
+  },[]);
   for(const p of parts){ out.push({speaker: speaker||"路人", text:p, style:"", pause:endPause(p), gain:0}); }
 }
 function narr(text){ return {speaker:"旁白", text, style:"", pause:endPause(text), gain:0}; }
@@ -259,7 +306,7 @@ function mergeNarr(arr, maxChars){
 }
 function addRole(name){ if(name && name!=="路人" && name!=="旁白") roleSet.add(name); }
 
-/* ====== 渲染与手动工具 ====== */
+/* ====== 渲染与手动工具（保留原有手动纠错能力） ====== */
 function renderAll(){
   renderTable(); renderRoles();
   const chars = items.reduce((a,b)=>a+(b.text||"").length,0);
@@ -268,6 +315,7 @@ function renderAll(){
 function renderRoles(){
   const counts={}; items.forEach(x=>{ const n=x.speaker||"旁白"; counts[n]=(counts[n]||0)+1; roleSet.add(n); });
   const rows = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  $("#roleSum").textContent = `${rows.length} 个`;
   const tb = $("#roleTbody"); tb.innerHTML="";
   rows.forEach(([n,c])=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${n}</td><td>${c}</td>`; tb.appendChild(tr); });
 }
@@ -279,10 +327,10 @@ function renderTable(){
   const tb = $("#scriptTbody"); tb.innerHTML="";
   items.forEach((it,idx)=>{
     const tr = document.createElement("tr");
-    const colorClass = it.speaker==="旁白"?"color-narr": "";
+    const roleColor = it.speaker==="旁白" ? "color-narr" : "";
     tr.innerHTML = `
       <td class="rownum">${idx+1}</td>
-      <td class="speaker ${colorClass}"><input data-i="${idx}" data-k="speaker" value="${esc(it.speaker)}"></td>
+      <td class="speaker ${roleColor}"><input data-i="${idx}" data-k="speaker" value="${esc(it.speaker)}"></td>
       <td class="text"><textarea data-i="${idx}" data-k="text">${esc(it.text)}</textarea>
         <div class="small">情绪
           <select data-i="${idx}" data-k="style">
@@ -312,7 +360,6 @@ function renderTable(){
     tb.appendChild(tr);
   });
 
-  // 绑定编辑
   tb.querySelectorAll("input[data-k],textarea[data-k],select[data-k]").forEach(el=>{
     el.addEventListener("input", e=>{
       const i = +e.target.getAttribute("data-i");
@@ -322,7 +369,6 @@ function renderTable(){
     });
   });
 
-  // 工具按钮
   tb.querySelectorAll(".setNarr").forEach(b=>b.onclick = e=>{ const i=+e.target.dataset.i; items[i].speaker="旁白"; renderAll(); });
   tb.querySelectorAll(".addRoleBtn").forEach(btn=>{
     btn.onclick = e=>{
@@ -331,7 +377,7 @@ function renderTable(){
       const sel = row.querySelector(".roleSel");
       const inp = row.querySelector(".newRoleInp");
       const name = inp.value.trim() || sel.value;
-      if(name){ items[i].speaker = name; roleSet.add(name); renderAll(); }
+      if(name){ items[i].speaker = name; roleSet.add(name); lastSpeaker = name; renderAll(); }
     };
   });
   tb.querySelectorAll(".splitAtCursor").forEach(b=>{
@@ -378,15 +424,15 @@ function renderTable(){
   tb.querySelectorAll(".del").forEach(b=>b.onclick = e=>{ const i=+e.target.dataset.i; items.splice(i,1); renderAll(); });
 }
 
-/* ====== 小工具 ====== */
-function esc(s){ return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function sel(v,k){ return (v===k)?"selected":""; }
-
 /* 角色管理面板 */
 $("#addRoleBtn").onclick = ()=>{
   const v = $("#newRole").value.trim(); if(!v) return;
   roleSet.add(v); $("#newRole").value=""; renderAll();
 };
+
+/* 小工具 */
+function esc(s){ return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function sel(v,k){ return (v===k)?"selected":""; }
 </script>
 </body>
 </html>
