@@ -1,251 +1,203 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <title>画本模块 · 有声小手机</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    :root{
-      --bg:#0b0d12; --panel:#111623; --panel2:#0e1422; --line:#1f2431; --line2:#28324a; --text:#e8ecf1; --muted:#9aa4b2;
-      --blue:#375dfc; --green:#10b981; --amber:#f59e0b; --pink:#ec4899; --gray:#6b7280;
-      --role-narr:#2b3347; --role-a:#253856; --role-b:#283a2f; --role-c:#3a2b3a; --role-d:#3b2f24;
-    }
-    *{ box-sizing: border-box; }
-    body{ margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:var(--text); background:var(--bg); }
-    header{ position:sticky; top:0; z-index:5; background:rgba(11,13,18,.8); backdrop-filter: blur(6px); border-bottom:1px solid var(--line); }
-    .bar{ max-width: 1280px; margin:0 auto; padding:12px 16px; display:flex; gap:12px; align-items:center; }
-    .btn{ background:var(--panel2); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:10px; cursor:pointer; }
-    .btn:hover{ border-color:#3851ff66; }
-    .ghost{ background:transparent; }
-    .right{ margin-left:auto; display:flex; gap:8px; align-items:center; }
-    .muted{ color:var(--muted); font-size:12px; }
-    .file{ color:var(--muted); }
-    .wrap{ max-width:1280px; margin:0 auto; padding:16px; display:grid; grid-template-columns: 260px 1fr; gap:16px; }
-    aside{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px; }
-    main{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:0; overflow:hidden; }
-    h2{ margin:0 0 8px; font-size:16px; }
-    table{ width:100%; border-collapse: collapse; }
-    th, td{ border-bottom:1px solid var(--line2); padding:10px; font-size:14px; vertical-align: top; }
-    th{ position:sticky; top:0; background:var(--panel2); z-index:2; }
-    .rownum{ width:56px; text-align:right; color:var(--muted); }
-    .speaker{ width:120px; }
-    .text{ width:auto; }
-    .cell-ops{ width:360px; }
-    .pill{ display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--line2); color:var(--muted); font-size:12px; }
-    .small{ font-size:12px; color:var(--muted); }
-    .rolelist{ width:100%; border-collapse: collapse; }
-    .rolelist th, .rolelist td{ border-bottom:1px dashed var(--line2); padding:8px 6px; font-size:13px; }
-    .hint{ margin-top:8px; font-size:12px; color:var(--muted); }
-    input[type="number"], select{ background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px; }
-    input[type="text"]{ width:100%; background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px; }
-    textarea{ width:100%; min-height:120px; background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:10px; padding:8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    .color-narr{ background: var(--role-narr); }
-    .color-a{ background: var(--role-a); }
-    .color-b{ background: var(--role-b); }
-    .color-c{ background: var(--role-c); }
-    .color-d{ background: var(--role-d); }
-    .toolbar { padding:12px; border-bottom:1px solid var(--line2); display:flex; gap:8px; align-items:center; }
-    .grow { flex:1; }
-    .stat { color:var(--muted); font-size:12px; }
-    a.link { color:#9ec1ff; text-decoration:none; }
-    a.link:hover{ text-decoration:underline; }
-  </style>
+<meta charset="utf-8" />
+<title>画本模块 · 有声小手机</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+:root{
+  --bg:#0b0d12; --panel:#111623; --panel2:#0e1422; --line:#1f2431; --line2:#28324a; --text:#e8ecf1; --muted:#9aa4b2;
+  --role-narr:#2b3347; --role-a:#253856; --role-b:#283a2f; --role-c:#3a2b3a; --role-d:#3b2f24;
+}
+*{ box-sizing:border-box }
+body{ margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; color:var(--text); background:var(--bg) }
+header{ position:sticky; top:0; z-index:5; background:rgba(11,13,18,.8); backdrop-filter:blur(6px); border-bottom:1px solid var(--line) }
+.bar{ max-width:1280px; margin:0 auto; padding:12px 16px; display:flex; gap:12px; align-items:center }
+.btn{ background:#0e1422; border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:10px; cursor:pointer }
+.btn:hover{ border-color:#3851ff66 }
+.ghost{ background:transparent }
+.right{ margin-left:auto; display:flex; gap:8px; align-items:center }
+.muted{ color:var(--muted); font-size:12px }
+.wrap{ max-width:1280px; margin:0 auto; padding:16px; display:grid; grid-template-columns:280px 1fr; gap:16px }
+aside{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px }
+main{ background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden }
+h2{ margin:0 0 8px; font-size:16px }
+table{ width:100%; border-collapse:collapse }
+th,td{ border-bottom:1px solid var(--line2); padding:10px; font-size:14px; vertical-align:top }
+th{ position:sticky; top:0; background:#0e1422; z-index:2 }
+.rownum{ width:56px; text-align:right; color:var(--muted) }
+.speaker{ width:130px }
+.text{ width:auto }
+.cell-ops{ width:420px }
+.small{ font-size:12px; color:var(--muted) }
+.rolelist th,.rolelist td{ border-bottom:1px dashed var(--line2); padding:8px 6px; font-size:13px }
+input[type="number"],select{ background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px }
+input[type="text"]{ width:100%; background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:8px; padding:6px 8px }
+textarea{ width:100%; min-height:120px; background:#0e1320; color:var(--text); border:1px solid var(--line2); border-radius:10px; padding:8px; font-family:ui-monospace,Menlo,Consolas,monospace }
+.color-narr{ background:var(--role-narr) }
+.color-a{ background:var(--role-a) }
+.color-b{ background:var(--role-b) }
+.color-c{ background:var(--role-c) }
+.color-d{ background:var(--role-d) }
+.toolbar{ padding:12px; border-bottom:1px solid var(--line2); display:flex; gap:8px; align-items:center }
+.pill{ display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--line2); color:var(--muted); font-size:12px }
+a.link{ color:#9ec1ff; text-decoration:none }
+a.link:hover{ text-decoration:underline }
+.rowtools{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px }
+.tool{ padding:4px 8px; border:1px solid var(--line2); border-radius:8px; background:#0e1422; font-size:12px; cursor:pointer }
+.tool:hover{ border-color:#3851ff66 }
+.inline{ display:inline-flex; gap:6px; align-items:center }
+.addrole{ width:120px }
+</style>
 </head>
 <body>
-  <header>
-    <div class="bar">
-      <a class="btn ghost" href="./index.html">← 返回首页</a>
-      <strong>画本模块</strong>
-      <span class="muted">上传纯文本，自动生成「旁白/角色台词」结构</span>
-      <div class="right">
-        <label class="btn">
-          选择文本… <input id="fileInput" type="file" accept=".txt,.md,.rtf" style="display:none;">
-        </label>
-        <button class="btn" id="parseBtn">自动画本</button>
-        <button class="btn" id="saveJsonBtn">导出JSON</button>
-        <button class="btn ghost" id="resetBtn">清空</button>
-      </div>
+<header>
+  <div class="bar">
+    <a class="btn ghost" href="./index.html">← 返回首页</a>
+    <strong>画本模块</strong>
+    <span class="muted">上传纯文本，自动生成，可手动修正。</span>
+    <div class="right">
+      <label class="btn">选择文本… <input id="fileInput" type="file" accept=".txt,.md,.rtf" style="display:none"></label>
+      <button class="btn" id="parseBtn">自动画本</button>
+      <button class="btn" id="saveJsonBtn">导出JSON</button>
+      <button class="btn ghost" id="resetBtn">清空</button>
     </div>
-  </header>
-
-  <div class="wrap">
-    <aside>
-      <h2>角色列表</h2>
-      <table class="rolelist">
-        <thead><tr><th>角色</th><th>段落数</th></tr></thead>
-        <tbody id="roleTbody"></tbody>
-      </table>
-      <div class="hint">可在右侧表中直接修改角色名，统计会自动刷新。</div>
-
-      <h2 style="margin-top:18px;">别名映射</h2>
-      <textarea id="aliasBox" placeholder='示例：{"宁宴":"许七安","小李子":"小李"}'></textarea>
-      <div class="hint">用于把外号/称呼统一成同一角色名。</div>
-
-      <h2 style="margin-top:18px;">全局说明</h2>
-      <div class="hint">问号300ms，叹号320ms，句号220ms，逗号/顿号160ms；连续旁白自动合并。</div>
-    </aside>
-
-    <main>
-      <div class="toolbar">
-        <span class="pill" id="fileName">未选择文件</span>
-        <span class="stat" id="statInfo">—</span>
-        <span class="grow"></span>
-        <a class="link" href="#" id="exampleLink">导入示例</a>
-      </div>
-      <table id="scriptTable">
-        <thead>
-          <tr>
-            <th class="rownum">#</th>
-            <th class="speaker">角色</th>
-            <th class="text">文本</th>
-            <th class="cell-ops">参数</th>
-          </tr>
-        </thead>
-        <tbody id="scriptTbody"></tbody>
-      </table>
-    </main>
   </div>
+</header>
+
+<div class="wrap">
+  <aside>
+    <h2>角色列表</h2>
+    <table class="rolelist"><thead><tr><th>角色</th><th>段落数</th></tr></thead><tbody id="roleTbody"></tbody></table>
+
+    <h2 style="margin-top:16px">管理角色</h2>
+    <div class="inline">
+      <input id="newRole" class="addrole" placeholder="新增角色名">
+      <button class="btn" id="addRoleBtn">添加</button>
+    </div>
+    <div class="small" style="margin-top:6px">添加后会出现在“指派角色”的下拉里。</div>
+
+    <h2 style="margin-top:16px">别名映射</h2>
+    <textarea id="aliasBox" placeholder='例如：{"宁宴":"许七安","小李子":"小李"}'></textarea>
+    <div class="small">把外号/称呼统一成同一角色名。</div>
+
+    <h2 style="margin-top:16px">说明</h2>
+    <div class="small">问号300ms，叹号320ms，句号220ms；连续旁白自动合并。</div>
+
+    <h2 style="margin-top:16px">导入示例</h2>
+    <button class="btn" id="exampleBtn">载入示例文本</button>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <span class="pill" id="fileName">未选择文件</span>
+      <span class="pill" id="statInfo">—</span>
+      <span style="flex:1"></span>
+    </div>
+    <table id="scriptTable">
+      <thead>
+        <tr>
+          <th class="rownum">#</th>
+          <th class="speaker">角色</th>
+          <th class="text">文本</th>
+          <th class="cell-ops">参数与操作</th>
+        </tr>
+      </thead>
+      <tbody id="scriptTbody"></tbody>
+    </table>
+  </main>
+</div>
 
 <script>
-/* ===================== 基础常量与状态 ===================== */
-const $  = sel => document.querySelector(sel);
-const $$ = sel => document.querySelectorAll(sel);
+/* ====== 状态与常量 ====== */
+const $  = s => document.querySelector(s);
+let rawText = "";            // 原始文本
+let items   = [];            // {speaker,text,style,pause,gain}
+let roleSet = new Set(["旁白"]);  // 角色集合，供下拉使用
 
-let rawText = "";
-let items   = [];   // {speaker, text, style, pause, gain}
-
-const roleColors   = {};
-const colorClasses = ["color-a","color-b","color-c","color-d"];
-const defaultPauseMap = { "？":300, "?":300, "！":320, "!":320, "。":220, ".":220, "，":160, ",":160, "、":160 };
-
+const NAME_WHITELIST = new Set(["旁白","许七安","王捕头","捕快甲","捕快乙","小李"]);
 const NARRATION_VERBS = /(道|说|问|喝道|喃喃|喊|冷哼|揶揄|叹道|应道)/;
-const NAME_WHITELIST  = new Set(["旁白","许七安","王捕头","捕快甲","捕快乙","小李"]);
-const MAX_NARR_CHARS  = 150;  // 连续旁白合并后的最大字数
+const defaultPauseMap = {"？":300,"?":300,"！":320,"!":320,"。":220,".":220};
+const MAX_NARR_CHARS = 150;
 
-/* ===================== 文件与按钮 ===================== */
-$("#fileInput").addEventListener("change", async (e)=>{
-  const f = e.target.files?.[0];
-  if(!f) return;
-  $("#fileName").textContent = f.name + `（${Math.round(f.size/1024)} KB）`;
+/* ====== 顶部按钮 ====== */
+$("#fileInput").addEventListener("change", async e=>{
+  const f = e.target.files?.[0]; if(!f) return;
+  $("#fileName").textContent = `${f.name}（${Math.round(f.size/1024)} KB）`;
   rawText = await f.text();
-  $("#statInfo").textContent = "已载入，点击“自动画本”开始解析。";
+  $("#statInfo").textContent = "已载入，点击“自动画本”。";
 });
-
 $("#parseBtn").addEventListener("click", ()=>{
-  if(!rawText.trim()){ alert("请先选择文本文件"); return; }
-  try{
-    const aliasMap = parseAlias($("#aliasBox").value);
-    items = parseToScript(rawText, aliasMap);
-    renderTable();
-    renderRoles();
-  }catch(err){
-    alert("解析失败：" + err.message);
-  }
+  if(!rawText.trim()) { alert("请先选择文本"); return; }
+  const alias = parseAlias($("#aliasBox").value);
+  items = parseToScript(rawText, alias);
+  renderAll();
 });
-
 $("#saveJsonBtn").addEventListener("click", ()=>{
   if(!items.length){ alert("无数据"); return; }
-  const cast = {};
-  items.map(x=>x.speaker.trim()).filter(Boolean).forEach(n=>cast[n]=cast[n]||"");
-  const payload = {
-    version:"script.v1",
-    cast,
-    script: items.map(x=>({
-      speaker: x.speaker.trim() || "旁白",
-      text:    x.text.trim(),
-      style:   x.style || undefined,
-      pause_ms_after: x.pause || undefined,
-      gain_db: x.gain  || undefined
-    }))
-  };
-  const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "huaben_" + Date.now() + ".json";
-  a.click();
+  const cast = {}; Array.from(roleSet).forEach(r=>cast[r]="");
+  const payload = {version:"script.v1", cast, script: items.map(x=>({speaker:x.speaker,text:x.text,style:x.style||undefined,pause_ms_after:x.pause||undefined,gain_db:x.gain||undefined}))};
+  const blob = new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `huaben_${Date.now()}.json`; a.click();
 });
-
 $("#resetBtn").addEventListener("click", ()=>{
-  rawText=""; items=[];
-  $("#fileInput").value="";
-  $("#fileName").textContent="未选择文件";
-  $("#scriptTbody").innerHTML="";
-  $("#roleTbody").innerHTML="";
-  $("#statInfo").textContent="—";
-  $("#aliasBox").value="";
+  rawText=""; items=[]; roleSet=new Set(["旁白"]);
+  $("#fileInput").value=""; $("#fileName").textContent="未选择文件"; $("#statInfo").textContent="—";
+  renderAll();
 });
-
-$("#exampleLink").addEventListener("click", (e)=>{
-  e.preventDefault();
-  const demo = `当许七安看到仵作的验尸报告后，又察觉出了一个疑点。
-耐着性子继续看，翻看完死者家人和仆人的供词，他闭上眼睛，梳理着思路。
-王捕头冷哼一声，揶揄道：“请问许捕快，凶手是何人，在何处？”
-许七安：“别急，头儿。”
-许七安：“我在卷宗中看到，张宅外墙上留了脚印是吗，你借此推断，贼人翻墙逃走，那小妇人所言不假。”
+$("#exampleBtn").addEventListener("click", ()=>{
+  rawText = `当许七安看到仵作的验尸报告后，又察觉出了一个疑点。
+耐着性子继续看，翻看完死者家人和仆人的供词，他闭上眼睛，梳理着思路。王捕头冷哼一声，揶揄道：“请问许捕快，凶手是何人，在何处？”
+“别急，头儿。”
+“许七安睁开眼：‘我在卷宗中看到，张宅外墙上留了脚印是吗，你借此推断，贼人翻墙逃走，那小妇人所言不假。’”
 王捕头：“有什么问题？”
-许七安：“脚印是朝外的，所以是逃离时留下的。”
-王捕头：“为什么会留下脚印。”
-许七安：“因为脚底有泥。”
-王捕头：“为什么会有泥。”
-许七安：“因为墙边是花圃。”
-许七安：“那么，卷宗上为什么没有进入院子的脚印？”
-捕快甲：“许是贼人进来时注意到了，没有留下痕迹。”
-捕快乙：“但杀人后急于逃脱，匆忙间留下了脚印。”
-许七安：“如果贼人能越过花圃不留脚印，这份轻功，那么逃走时不必踏墙借力。”
-小李：“或许贼人最初并不想杀人？”
-王捕头：“不对！钝器击中后脑，一击毙命，是起了杀心的。”
-许七安：“除非凶手当时没有趁手的武器。”
-许七安：“还有：张杨氏久跪后昏厥，大夫诊断她怀孕了。”
-王捕头：“宁宴，你说清楚……"
-许七安：“也许这不是入宅偷盗案，而是偷情杀人案。”`;
-  rawText = demo;
-  $("#fileName").textContent = "示例文本";
-  $("#statInfo").textContent = "已载入示例，点击“自动画本”。";
+许七安：“脚印是朝外的，所以是逃离时留下的。”`;
+  $("#fileName").textContent="示例文本"; $("#statInfo").textContent="已载入示例，点击“自动画本”。";
 });
 
-/* ===================== 解析主流程（已修正） ===================== */
+/* ====== 解析（修复版） ====== */
 function parseToScript(text, alias){
-  const lines = blockify(text);
-  const out   = [];
-
+  const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const out = [];
   for(const raw of lines){
     const s = raw.trim();
 
-    // 1) 引号台词优先：叙述 + “台词”
-    let m = s.match(/^(.*?)([“"])(.+?)([”"])\s*$/);
+    // 1) 引号优先：叙述 + “……”
+    let m = s.match(/^(.*?)[“"](.*)[”"]\s*$/);
     if(m){
       const before = m[1].trim();
-      const quoted = m[3].trim();
-      const spGuess = guessSpeaker(before, alias) || "";
+      let quoted = m[2].trim();
 
-      if(before) out.push(narr(before));                 // 叙述部分做旁白
-      if(quoted) splitAndPush(out, spGuess || "路人", quoted); // 引号内容作为台词
+      // 引号内再次抽“姓名：台词”或“姓名+叙述动词+：台词”
+      const ext = extractSpeakerFromQuoted(quoted, alias);
+      if(before) out.push(narr(before));
+      if(ext){ splitAndPush(out, ext.speaker, ext.text); addRole(ext.speaker); }
+      else { splitAndPush(out, "", quoted); } // 仍未知说话人
       continue;
     }
 
-    // 2) 严格版“人物: 台词”（无引号、无叙述动词）
+    // 2) 严格“姓名：台词”（无引号且无叙述动词）
     m = s.match(/^([^\s:：]{1,8})\s*[:：]\s*(.+)$/);
     if(m){
-      const rawName = m[1].trim();
-      const after   = m[2].trim();
+      const name = normalizeSpeaker(m[1], alias);
+      const after = m[2].trim();
       const hasQuote = /[“”"]/.test(after);
       const hasVerb  = NARRATION_VERBS.test(s);
-      const name     = normalizeSpeaker(rawName, alias);
-
       if(!hasQuote && !hasVerb && (NAME_WHITELIST.has(name) || name==="旁白" || name.length<=4)){
-        splitAndPush(out, name==="旁白" ? "旁白" : name, after);
+        splitAndPush(out, name==="旁白"?"旁白":name, after);
+        addRole(name);
       }else{
-        out.push(narr(s)); // 不满足条件，整体当旁白
+        out.push(narr(s));
       }
       continue;
     }
 
-    // 3) 其它情况 → 旁白
+    // 3) 其它 → 旁白
     out.push(narr(s));
   }
 
-  // 情绪与停顿标注
-  for(const it of out){
+  // 情绪/停顿
+  out.forEach(it=>{
     if(!it.style){
       if(/冷哼|揶揄/.test(it.text)) it.style="taunt";
       else if(/愣住|面面相觑|惊/.test(it.text)) it.style="surprised";
@@ -254,108 +206,87 @@ function parseToScript(text, alias){
     }
     if(!it.pause) it.pause = endPause(it.text);
     it.gain = it.gain ?? 0;
+  });
+
+  // 合并连续旁白
+  return mergeNarr(out, MAX_NARR_CHARS);
+}
+
+function extractSpeakerFromQuoted(q, alias){
+  // 形态1：姓名：台词
+  let m = q.match(/^([^\s:：]{1,8})\s*[:：]\s*(.+)$/);
+  if(m){
+    const name = normalizeSpeaker(m[1], alias);
+    if(name!=="“" && name!=="”") return {speaker:name, text:m[2].trim()};
   }
-
-  // 4) 合并连续旁白（关键修正）
-  return mergeConsecutiveNarration(out, MAX_NARR_CHARS);
+  // 形态2：姓名 + 叙述动词 + ： 台词
+  m = q.match(/^([^\s，。、“”"！？：:]{1,8}).{0,6}?(?:冷哼|揶揄|皱眉|点头|沉思|问|说|道|喝道)?\s*[:：]\s*[“"]?(.+?)[”"]?$/);
+  if(m){
+    const name = normalizeSpeaker(m[1], alias);
+    return {speaker:name, text:m[2].trim()};
+  }
+  return null;
 }
 
-/* ===================== 工具函数（含修正） ===================== */
-function parseAlias(s){
-  if(!s.trim()) return {};
-  try{ return JSON.parse(s); } catch{ throw new Error("别名映射不是合法 JSON"); }
-}
-function blockify(t){
-  return t.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-}
+/* ====== 工具函数 ====== */
+function parseAlias(s){ if(!s.trim()) return {}; try{ return JSON.parse(s); }catch{ alert("别名映射不是合法 JSON"); return {}; } }
 function normalizeSpeaker(name, alias){
-  name = name.replace(/[“”"『』【】]/g,"").trim();
+  name = String(name||"").replace(/[“”"『』【】]/g,"").trim();
   if(alias && alias[name]) return alias[name];
-  if(name === "宁宴") return "许七安"; // 示例别名
-  if(/^捕快/.test(name)) return name; // 捕快甲/乙…
+  if(name==="宁宴") return "许七安";
   return name;
 }
-function guessSpeaker(before, alias){
-  // 仅当出现“姓名 + 叙述动词”时才返回说话人
-  const m = before.match(/([^\s，。、“”"！？：:]{1,6}).{0,6}?(?:冷哼|揶揄|皱眉|瞪眼|点头|沉思|喃喃|低声|高声)?\s*(?:道|说|问|喝道|喃喃|喊)/);
-  if(m) return normalizeSpeaker(m[1], alias);
-  return "";
-}
-function cleanNarr(s){
-  return s.replace(/^(?:他|她|众人)心里?想[道]?[：:]?/, "");
-}
-function endPause(s){
-  for(let i=s.length-1;i>=0;i--){
-    const ch = s[i];
-    if(defaultPauseMap[ch]!=null) return defaultPauseMap[ch];
-  }
-  return 200;
-}
+function endPause(s){ for(let i=s.length-1;i>=0;i--){ const ch=s[i]; if(defaultPauseMap[ch]!=null) return defaultPauseMap[ch]; } return 220; }
 function splitAndPush(out, speaker, content){
-  // 只按句号/问号/叹号切，避免把旁白切碎
-  const parts = content.split(/([。！？!?])/).reduce((acc, cur, i, arr)=>{
-    if(i%2===0){
-      const p = (cur + (arr[i+1]||"")).trim();
-      if(p) acc.push(p);
-    }
-    return acc;
-  },[]);
-  for(const p of parts){
-    out.push({speaker: speaker || "路人", text:p, style:"", pause:endPause(p), gain:0});
-  }
+  const parts = content.split(/([。！？!?])/).reduce((acc,cur,i,arr)=>{ if(i%2===0){ const p=(cur+(arr[i+1]||"")).trim(); if(p) acc.push(p); } return acc; },[]);
+  for(const p of parts){ out.push({speaker: speaker||"路人", text:p, style:"", pause:endPause(p), gain:0}); }
 }
-function narr(text){
-  return { speaker:"旁白", text: cleanNarr(text), style:"", pause:endPause(text), gain:0 };
-}
-function mergeConsecutiveNarration(arr, maxChars){
-  if(!arr.length) return arr;
-  const out = [];
-  let buf = null;
-
+function narr(text){ return {speaker:"旁白", text, style:"", pause:endPause(text), gain:0}; }
+function mergeNarr(arr, maxChars){
+  const out=[]; let buf=null;
   for(const it of arr){
-    if(it.speaker === "旁白"){
-      if(!buf){ buf = {...it}; }
+    if(it.speaker==="旁白"){
+      if(!buf) buf={...it};
       else{
-        const merged = (buf.text ? buf.text + " " : "") + it.text;
-        if(merged.length <= maxChars){
-          buf.text  = merged;
-          buf.pause = it.pause; // 以最后一条的停顿为段尾停顿
-        }else{
-          out.push(buf);
-          buf = {...it};
-        }
+        const merged = (buf.text?buf.text+" ":"")+it.text;
+        if(merged.length<=maxChars){ buf.text=merged; buf.pause=it.pause; }
+        else{ out.push(buf); buf={...it}; }
       }
-    }else{
-      if(buf){ out.push(buf); buf = null; }
-      out.push(it);
-    }
+    }else{ if(buf){ out.push(buf); buf=null; } out.push(it); }
   }
   if(buf) out.push(buf);
   return out;
 }
+function addRole(name){ if(name && name!=="路人" && name!=="旁白") roleSet.add(name); }
 
-/* ===================== 渲染 ===================== */
+/* ====== 渲染与手动工具 ====== */
+function renderAll(){
+  renderTable(); renderRoles();
+  const chars = items.reduce((a,b)=>a+(b.text||"").length,0);
+  $("#statInfo").textContent = `行数 ${items.length} · 字数约 ${chars} · 角色 ${roleSet.size}`;
+}
+function renderRoles(){
+  const counts={}; items.forEach(x=>{ const n=x.speaker||"旁白"; counts[n]=(counts[n]||0)+1; roleSet.add(n); });
+  const rows = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const tb = $("#roleTbody"); tb.innerHTML="";
+  rows.forEach(([n,c])=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${n}</td><td>${c}</td>`; tb.appendChild(tr); });
+}
+function roleOptionsHTML(selected){
+  const opts = Array.from(new Set(["旁白",...Array.from(roleSet)])).map(r=>`<option value="${r}" ${r===selected?"selected":""}>${r}</option>`).join("");
+  return `<select class="roleSel">${opts}</select> <input class="newRoleInp" placeholder="+新角色" style="width:96px"> <button class="tool addRoleBtn">指派</button>`;
+}
 function renderTable(){
-  const tb = $("#scriptTbody");
-  tb.innerHTML = "";
-
-  const roles = [...new Set(items.map(x=>x.speaker))];
-  roles.forEach((r, i)=> roleColors[r] = roleColors[r] || colorClasses[i % colorClasses.length]);
-
-  let totalChars = 0;
-  items.forEach((it, idx)=>{
-    totalChars += it.text.length;
+  const tb = $("#scriptTbody"); tb.innerHTML="";
+  items.forEach((it,idx)=>{
     const tr = document.createElement("tr");
+    const colorClass = it.speaker==="旁白"?"color-narr": "";
     tr.innerHTML = `
       <td class="rownum">${idx+1}</td>
-      <td class="speaker ${ (it.speaker==="旁白" ? "color-narr" : roleColors[it.speaker]||"") }">
-        <input type="text" value="${escapeHtml(it.speaker)}" data-i="${idx}" data-k="speaker" />
-      </td>
-      <td class="text">
-        <textarea data-i="${idx}" data-k="text">${escapeHtml(it.text)}</textarea>
+      <td class="speaker ${colorClass}"><input data-i="${idx}" data-k="speaker" value="${esc(it.speaker)}"></td>
+      <td class="text"><textarea data-i="${idx}" data-k="text">${esc(it.text)}</textarea>
         <div class="small">情绪
           <select data-i="${idx}" data-k="style">
-            <option value="">默认</option>
+            <option value="" ${sel(it.style,"")}>默认</option>
             <option value="calm" ${sel(it.style,"calm")}>calm</option>
             <option value="taunt" ${sel(it.style,"taunt")}>taunt</option>
             <option value="surprised" ${sel(it.style,"surprised")}>surprised</option>
@@ -366,45 +297,96 @@ function renderTable(){
         </div>
       </td>
       <td class="cell-ops">
-        <div class="small">停顿(ms) <input type="number" min="0" step="10" value="${it.pause||200}" data-i="${idx}" data-k="pause" style="width:100px"></div>
-        <div class="small" style="margin-top:6px;">增益(dB) <input type="number" step="0.5" value="${it.gain||0}" data-i="${idx}" data-k="gain" style="width:100px"></div>
-      </td>
-    `;
+        <div class="small">停顿(ms) <input type="number" data-i="${idx}" data-k="pause" value="${it.pause||220}" style="width:90px">　增益(dB) <input type="number" step="0.5" data-i="${idx}" data-k="gain" value="${it.gain||0}" style="width:90px"></div>
+        <div class="rowtools">
+          <button class="tool setNarr" data-i="${idx}">设为旁白</button>
+          <span class="inline">${roleOptionsHTML(it.speaker)}</span>
+          <button class="tool splitAtCursor" data-i="${idx}">按光标拆分</button>
+          <button class="tool autosplit" data-i="${idx}">按句号拆分</button>
+          <button class="tool mergePrev" data-i="${idx}">合并到上一行</button>
+          <button class="tool up" data-i="${idx}">上移</button>
+          <button class="tool down" data-i="${idx}">下移</button>
+          <button class="tool del" data-i="${idx}">删除</button>
+        </div>
+      </td>`;
     tb.appendChild(tr);
   });
 
-  $("#statInfo").textContent = `行数 ${items.length} · 总字数约 ${totalChars}`;
-
-  tb.querySelectorAll("input,textarea,select").forEach(el=>{
+  // 绑定编辑
+  tb.querySelectorAll("input[data-k],textarea[data-k],select[data-k]").forEach(el=>{
     el.addEventListener("input", e=>{
-      const i = Number(e.target.getAttribute("data-i"));
+      const i = +e.target.getAttribute("data-i");
       const k = e.target.getAttribute("data-k");
-      if(k==="pause" || k==="gain"){ items[i][k] = Number(e.target.value); }
-      else { items[i][k] = e.target.value; }
-      if(k==="speaker"){ renderRoles(); }
+      items[i][k] = (k==="pause"||k==="gain") ? Number(e.target.value) : e.target.value;
+      if(k==="speaker"){ roleSet.add(items[i][k]); renderRoles(); }
     });
   });
+
+  // 工具按钮
+  tb.querySelectorAll(".setNarr").forEach(b=>b.onclick = e=>{ const i=+e.target.dataset.i; items[i].speaker="旁白"; renderAll(); });
+  tb.querySelectorAll(".addRoleBtn").forEach(btn=>{
+    btn.onclick = e=>{
+      const row = e.target.closest("tr");
+      const i = +row.querySelector(".setNarr").dataset.i;
+      const sel = row.querySelector(".roleSel");
+      const inp = row.querySelector(".newRoleInp");
+      const name = inp.value.trim() || sel.value;
+      if(name){ items[i].speaker = name; roleSet.add(name); renderAll(); }
+    };
+  });
+  tb.querySelectorAll(".splitAtCursor").forEach(b=>{
+    b.onclick = e=>{
+      const i = +e.target.dataset.i;
+      const ta = e.target.closest("tr").querySelector("textarea[data-k='text']");
+      const pos = ta.selectionStart;
+      const t = items[i].text;
+      if(pos>0 && pos<t.length){
+        const a = t.slice(0,pos).trim(), b2 = t.slice(pos).trim();
+        if(a && b2){
+          const row = items[i];
+          items.splice(i,1,{...row,text:a},{...row,text:b2});
+          renderAll();
+        }
+      }
+    };
+  });
+  tb.querySelectorAll(".autosplit").forEach(b=>{
+    b.onclick = e=>{
+      const i = +e.target.dataset.i;
+      const row = items[i];
+      const parts = row.text.split(/([。！？!?])/).reduce((acc,cur,idx,arr)=>{ if(idx%2===0){ const p=(cur+(arr[idx+1]||"")).trim(); if(p) acc.push(p);} return acc;},[]);
+      if(parts.length>1){
+        const newRows = parts.map(p=>({...row,text:p}));
+        items.splice(i,1,...newRows);
+        renderAll();
+      }
+    };
+  });
+  tb.querySelectorAll(".mergePrev").forEach(b=>{
+    b.onclick = e=>{
+      const i = +e.target.dataset.i;
+      if(i>0){
+        items[i-1].text = `${items[i-1].text} ${items[i].text}`.trim();
+        items[i-1].pause = items[i].pause;
+        items.splice(i,1);
+        renderAll();
+      }
+    };
+  });
+  tb.querySelectorAll(".up").forEach(b=>b.onclick = e=>{ const i=+e.target.dataset.i; if(i>0){ [items[i-1],items[i]]=[items[i],items[i-1]]; renderAll(); } });
+  tb.querySelectorAll(".down").forEach(b=>b.onclick = e=>{ const i=+e.target.dataset.i; if(i<items.length-1){ [items[i],items[i+1]]=[items[i+1],items[i]]; renderAll(); } });
+  tb.querySelectorAll(".del").forEach(b=>b.onclick = e=>{ const i=+e.target.dataset.i; items.splice(i,1); renderAll(); });
 }
 
-function renderRoles(){
-  const counts = {};
-  items.forEach(x=>{
-    const n = x.speaker || "旁白";
-    counts[n] = (counts[n]||0) + 1;
-  });
-  const rows = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const tb = $("#roleTbody");
-  tb.innerHTML = "";
-  rows.forEach(([name, c])=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${name}</td><td>${c}</td>`;
-    tb.appendChild(tr);
-  });
-}
+/* ====== 小工具 ====== */
+function esc(s){ return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function sel(v,k){ return (v===k)?"selected":""; }
 
-/* ===================== 小工具 ===================== */
-function sel(v,k){ return v===k ? "selected" : ""; }
-function escapeHtml(s){ return s.replace(/[&<>"]/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m])); }
+/* 角色管理面板 */
+$("#addRoleBtn").onclick = ()=>{
+  const v = $("#newRole").value.trim(); if(!v) return;
+  roleSet.add(v); $("#newRole").value=""; renderAll();
+};
 </script>
 </body>
 </html>
