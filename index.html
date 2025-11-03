@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>有声小手机 · 前端壳</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --w: 980px; --g: 12px; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; padding:24px; background:#0b0d12; color:#e8ecf1; }
+    .wrap { max-width: var(--w); margin: 0 auto; }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    h2 { font-size: 16px; margin: 20px 0 8px; }
+    section { background:#121621; border:1px solid #1f2431; border-radius:12px; padding:16px; margin-top:16px; }
+    input, select, textarea, button { background:#0f1320; color:#e8ecf1; border:1px solid #2a3142; border-radius:8px; padding:8px; }
+    input, select, textarea { width:100%; }
+    textarea { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; min-height: 160px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding:6px; border-bottom:1px dashed #263047; }
+    .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: var(--g); }
+    .row { display:flex; gap: var(--g); align-items:center; }
+    .muted { opacity:.7; font-size:12px; }
+    .right { text-align:right; }
+    .pill { padding:6px 10px; border-radius:999px; border:1px solid #38425c; display:inline-block; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>有声小手机 · 前端壳</h1>
+    <div class="muted">先在浏览器里完成剧本、角色与节奏。预览用浏览器自带语音。导出 JSON 以后再接 MiniMax。</div>
+
+    <section>
+      <h2>角色库</h2>
+      <table id="castTable">
+        <thead><tr><th>角色名</th><th>声音标识（先占位）</th><th class="right">操作</th></tr></thead>
+        <tbody id="castBody"></tbody>
+      </table>
+      <div class="row" style="margin-top:8px;">
+        <button id="addRole">+ 新增角色</button>
+        <span class="muted">示例：旁白 / 女主 / 男主。声音标识先写你喜欢的代号，后端再映射为 MiniMax 的 voice_id。</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>脚本</h2>
+      <textarea id="scriptBox" placeholder="按行书写：&#10;旁白: 夜色像墨，雨丝细密。&#10;女主: 你来了。&#10;男主: 路上有点堵。"></textarea>
+      <div class="muted">格式为「人物: 台词」。未在角色库出现的角色，稍后导出时会标记为未知。</div>
+    </section>
+
+    <section>
+      <h2>参数</h2>
+      <div class="grid">
+        <label>语速<input id="speed" type="number" step="0.05" value="1.00"></label>
+        <label>音调<input id="pitch" type="number" step="0.1" value="0.0"></label>
+        <label>句间停顿(ms)<input id="pause" type="number" value="250"></label>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <span class="pill">预览引擎：浏览器 SpeechSynthesis</span>
+        <span class="muted">仅用于试听节奏，不代表最终音色。</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>预览与导出</h2>
+      <div class="row">
+        <button id="previewBtn">逐句预览</button>
+        <button id="stopBtn">停止预览</button>
+        <button id="exportBtn">导出任务 JSON</button>
+        <button id="saveBtn">保存到浏览器</button>
+        <button id="loadBtn">从浏览器恢复</button>
+      </div>
+      <div id="status" class="muted" style="margin-top:8px;"></div>
+      <audio id="player" controls style="width:100%; display:none;"></audio>
+    </section>
+  </div>
+
+<script>
+  // 状态
+  const castBody = document.getElementById('castBody');
+  const scriptBox = document.getElementById('scriptBox');
+  const speed = document.getElementById('speed');
+  const pitch = document.getElementById('pitch');
+  const pause = document.getElementById('pause');
+  const statusEl = document.getElementById('status');
+
+  const defaultCast = [
+    {name:'旁白', voice:'narrator'},
+    {name:'女主', voice:'female_soft'},
+    {name:'男主', voice:'male_calm'}
+  ];
+
+  function loadState() {
+    const s = localStorage.getItem('audiobook_state_v1');
+    if (!s) return { cast: defaultCast, script: '' };
+    try { return JSON.parse(s); } catch { return { cast: defaultCast, script: '' }; }
+  }
+  function saveState(state) {
+    localStorage.setItem('audiobook_state_v1', JSON.stringify(state));
+  }
+
+  let state = loadState();
+  scriptBox.value = state.script || '';
+
+  // 角色表渲染
+  function renderCast() {
+    castBody.innerHTML = '';
+    (state.cast || defaultCast).forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${row.name}" data-idx="${idx}" data-k="name"></td>
+        <td><input value="${row.voice}" data-idx="${idx}" data-k="voice" placeholder="先写占位，后端再映射"></td>
+        <td class="right"><button data-del="${idx}">删除</button></td>
+      `;
+      castBody.appendChild(tr);
+    });
+  }
+  state.cast = state.cast || defaultCast;
+  renderCast();
+
+  // 事件
+  document.getElementById('addRole').onclick = () => {
+    state.cast.push({name:'', voice:''});
+    renderCast();
+  };
+  castBody.addEventListener('input', e => {
+    const idx = e.target.getAttribute('data-idx');
+    const k = e.target.getAttribute('data-k');
+    if (idx != null && k) {
+      state.cast[idx][k] = e.target.value;
+    }
+  });
+  castBody.addEventListener('click', e => {
+    const del = e.target.getAttribute('data-del');
+    if (del != null) {
+      state.cast.splice(Number(del),1);
+      renderCast();
+    }
+  });
+
+  document.getElementById('saveBtn').onclick = () => {
+    state.script = scriptBox.value;
+    saveState(state);
+    toast('已保存到本地浏览器');
+  };
+  document.getElementById('loadBtn').onclick = () => {
+    state = loadState();
+    scriptBox.value = state.script || '';
+    renderCast();
+    toast('已从本地恢复');
+  };
+
+  // 脚本解析
+  function parseScript(raw) {
+    const lines = [];
+    raw.split(/\r?\n/).forEach(l => {
+      const s = l.trim();
+      if (!s) return;
+      const m = s.match(/^([^:：]+)\s*[:：]\s*(.+)$/);
+      if (m) lines.push({ speaker: m[1].trim(), text: m[2].trim() });
+    });
+    return lines;
+  }
+
+  // 预览播放：浏览器 SpeechSynthesis
+  let speaking = false;
+  document.getElementById('previewBtn').onclick = async () => {
+    const lines = parseScript(scriptBox.value);
+    if (!lines.length) return toast('脚本为空');
+    speaking = true;
+    toast(`开始预览，共 ${lines.length} 句`);
+    for (const L of lines) {
+      if (!speaking) break;
+      const u = new SpeechSynthesisUtterance(`${L.speaker}。${L.text}`);
+      u.rate = clamp(parseFloat(speed.value) || 1.0, 0.5, 2.0);
+      u.pitch = clamp(parseFloat(pitch.value) || 0.0, -2.0, 2.0) + 1.0; // 浏览器基准为 1
+      speechSynthesis.speak(u);
+      await once(u, 'end');
+      await sleep(parseInt(pause.value) || 250);
+    }
+    toast('预览结束');
+  };
+  document.getElementById('stopBtn').onclick = () => {
+    speaking = false;
+    speechSynthesis.cancel();
+    toast('已停止预览');
+  };
+
+  // 导出任务 JSON
+  document.getElementById('exportBtn').onclick = () => {
+    const lines = parseScript(scriptBox.value);
+    if (!lines.length) return toast('脚本为空');
+    const castMap = {};
+    (state.cast||[]).forEach(r => { if (r.name && r.voice) castMap[r.name]=r.voice; });
+
+    const payload = {
+      version: "job.v1",
+      params: { speed: Number(speed.value)||1.0, pitch: Number(pitch.value)||0.0, pause_ms: Number(pause.value)||250, format: "mp3" },
+      cast: castMap,
+      script: lines
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `audiobook-job-${Date.now()}.json`;
+    a.click();
+    toast('已导出任务 JSON');
+  };
+
+  // 小工具
+  function toast(msg){ statusEl.textContent = msg; }
+  function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+  function once(target, evt){ return new Promise(r=>target.addEventListener(evt, ()=>r(), {once:true})); }
+  function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+</script>
+</body>
+</html>
