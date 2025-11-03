@@ -32,7 +32,6 @@
     .text{ width:auto; }
     .cell-ops{ width:360px; }
     .pill{ display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid var(--line2); color:var(--muted); font-size:12px; }
-    .tag{ font-size:12px; padding:4px 8px; border-radius:999px; background:#1a2237; border:1px solid #2b3560; color:#c9d5ff; }
     .small{ font-size:12px; color:var(--muted); }
     .rolelist{ width:100%; border-collapse: collapse; }
     .rolelist th, .rolelist td{ border-bottom:1px dashed var(--line2); padding:8px 6px; font-size:13px; }
@@ -80,10 +79,10 @@
 
       <h2 style="margin-top:18px;">别名映射</h2>
       <textarea id="aliasBox" placeholder='示例：{"宁宴":"许七安","小李子":"小李"}'></textarea>
-      <div class="hint">可选。用于把“外号/称呼”统一成同一角色名。</div>
+      <div class="hint">用于把外号/称呼统一成同一角色名。</div>
 
-      <h2 style="margin-top:18px;">全局参数</h2>
-      <div class="hint">问号300ms，叹号320ms，句号220ms，逗号/顿号160ms。可在导出后再调。</div>
+      <h2 style="margin-top:18px;">全局说明</h2>
+      <div class="hint">问号300ms，叹号320ms，句号220ms，逗号/顿号160ms；连续旁白自动合并。</div>
     </aside>
 
     <main>
@@ -102,24 +101,28 @@
             <th class="cell-ops">参数</th>
           </tr>
         </thead>
-        <tbody id="scriptTbody">
-          <!-- 动态渲染 -->
-        </tbody>
+        <tbody id="scriptTbody"></tbody>
       </table>
     </main>
   </div>
 
 <script>
-/* ============ 基础状态 ============ */
-let rawText = "";
-let items = [];   // {speaker, text, style, pause, gain}
-const $ = sel => document.querySelector(sel);
+/* ===================== 基础常量与状态 ===================== */
+const $  = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
-const roleColors = {};
+
+let rawText = "";
+let items   = [];   // {speaker, text, style, pause, gain}
+
+const roleColors   = {};
 const colorClasses = ["color-a","color-b","color-c","color-d"];
 const defaultPauseMap = { "？":300, "?":300, "！":320, "!":320, "。":220, ".":220, "，":160, ",":160, "、":160 };
 
-/* ============ 读取文件 ============ */
+const NARRATION_VERBS = /(道|说|问|喝道|喃喃|喊|冷哼|揶揄|叹道|应道)/;
+const NAME_WHITELIST  = new Set(["旁白","许七安","王捕头","捕快甲","捕快乙","小李"]);
+const MAX_NARR_CHARS  = 150;  // 连续旁白合并后的最大字数
+
+/* ===================== 文件与按钮 ===================== */
 $("#fileInput").addEventListener("change", async (e)=>{
   const f = e.target.files?.[0];
   if(!f) return;
@@ -128,7 +131,6 @@ $("#fileInput").addEventListener("change", async (e)=>{
   $("#statInfo").textContent = "已载入，点击“自动画本”开始解析。";
 });
 
-/* ============ 解析入口 ============ */
 $("#parseBtn").addEventListener("click", ()=>{
   if(!rawText.trim()){ alert("请先选择文本文件"); return; }
   try{
@@ -149,11 +151,11 @@ $("#saveJsonBtn").addEventListener("click", ()=>{
     version:"script.v1",
     cast,
     script: items.map(x=>({
-      speaker:x.speaker.trim() || "旁白",
-      text:x.text.trim(),
-      style: x.style || undefined,
+      speaker: x.speaker.trim() || "旁白",
+      text:    x.text.trim(),
+      style:   x.style || undefined,
       pause_ms_after: x.pause || undefined,
-      gain_db: x.gain || undefined
+      gain_db: x.gain  || undefined
     }))
   };
   const blob = new Blob([JSON.stringify(payload,null,2)], {type:"application/json"});
@@ -173,7 +175,6 @@ $("#resetBtn").addEventListener("click", ()=>{
   $("#aliasBox").value="";
 });
 
-/* ============ 示例导入 ============ */
 $("#exampleLink").addEventListener("click", (e)=>{
   e.preventDefault();
   const demo = `当许七安看到仵作的验尸报告后，又察觉出了一个疑点。
@@ -202,72 +203,87 @@ $("#exampleLink").addEventListener("click", (e)=>{
   $("#statInfo").textContent = "已载入示例，点击“自动画本”。";
 });
 
-/* ============ 解析实现 ============ */
-function parseAlias(s){
-  if(!s.trim()) return {};
-  try{ return JSON.parse(s); } catch{ throw new Error("别名映射不是合法 JSON"); }
-}
-
+/* ===================== 解析主流程（已修正） ===================== */
 function parseToScript(text, alias){
   const lines = blockify(text);
-  const out = [];
-  for(const line of lines){
-    // 1) “人物: 台词”
-    let m = line.match(/^([^:：]+)\s*[:：]\s*["“]?(.+?)["”]?$/);
+  const out   = [];
+
+  for(const raw of lines){
+    const s = raw.trim();
+
+    // 1) 引号台词优先：叙述 + “台词”
+    let m = s.match(/^(.*?)([“"])(.+?)([”"])\s*$/);
     if(m){
-      let sp = normalizeSpeaker(m[1].trim(), alias);
-      let content = m[2].trim();
-      splitAndPush(out, sp, content);
-      continue;
-    }
-    // 2) 引号内对话 + 说话人提示词
-    m = line.match(/(.+?)(["“](.+?)["”])(.*)/);
-    if(m){
-      const before = m[1];
+      const before = m[1].trim();
       const quoted = m[3].trim();
-      const guessSp = guessSpeaker(before, alias) || "旁白";
-      if(before.trim()) out.push({speaker:"旁白", text:cleanNarr(before.trim()), style:"", pause: endPause(before)});
-      splitAndPush(out, guessSp, quoted);
+      const spGuess = guessSpeaker(before, alias) || "";
+
+      if(before) out.push(narr(before));                 // 叙述部分做旁白
+      if(quoted) splitAndPush(out, spGuess || "路人", quoted); // 引号内容作为台词
       continue;
     }
-    // 3) 纯叙述 → 旁白
-    out.push({speaker:"旁白", text:cleanNarr(line), style:"", pause:endPause(line)});
+
+    // 2) 严格版“人物: 台词”（无引号、无叙述动词）
+    m = s.match(/^([^\s:：]{1,8})\s*[:：]\s*(.+)$/);
+    if(m){
+      const rawName = m[1].trim();
+      const after   = m[2].trim();
+      const hasQuote = /[“”"]/.test(after);
+      const hasVerb  = NARRATION_VERBS.test(s);
+      const name     = normalizeSpeaker(rawName, alias);
+
+      if(!hasQuote && !hasVerb && (NAME_WHITELIST.has(name) || name==="旁白" || name.length<=4)){
+        splitAndPush(out, name==="旁白" ? "旁白" : name, after);
+      }else{
+        out.push(narr(s)); // 不满足条件，整体当旁白
+      }
+      continue;
+    }
+
+    // 3) 其它情况 → 旁白
+    out.push(narr(s));
   }
-  // 基本情绪打点
+
+  // 情绪与停顿标注
   for(const it of out){
     if(!it.style){
-      if(/冷哼|揶揄|嘲|嗤/.test(it.text)) it.style="taunt";
-      else if(/愣住|面面相觑|惊|怔/.test(it.text)) it.style="surprised";
+      if(/冷哼|揶揄/.test(it.text)) it.style="taunt";
+      else if(/愣住|面面相觑|惊/.test(it.text)) it.style="surprised";
       else if(/沉思|点头|喃喃/.test(it.text)) it.style="calm";
       else it.style="";
     }
     if(!it.pause) it.pause = endPause(it.text);
-    it.gain = 0;
+    it.gain = it.gain ?? 0;
   }
-  return out;
+
+  // 4) 合并连续旁白（关键修正）
+  return mergeConsecutiveNarration(out, MAX_NARR_CHARS);
 }
 
+/* ===================== 工具函数（含修正） ===================== */
+function parseAlias(s){
+  if(!s.trim()) return {};
+  try{ return JSON.parse(s); } catch{ throw new Error("别名映射不是合法 JSON"); }
+}
 function blockify(t){
   return t.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
 }
 function normalizeSpeaker(name, alias){
   name = name.replace(/[“”"『』【】]/g,"").trim();
   if(alias && alias[name]) return alias[name];
-  // 常见别名归一
-  if(name === "宁宴") return "许七安";
-  if(/^捕快/.test(name)) return name; // 捕快甲/乙
+  if(name === "宁宴") return "许七安"; // 示例别名
+  if(/^捕快/.test(name)) return name; // 捕快甲/乙…
   return name;
 }
 function guessSpeaker(before, alias){
-  // 根据“X道/问/说/喝道/笑道/应道/喃喃”等提示词猜测说话人
-  const m = before.match(/([^\s，。、“”"！？：:]{1,6})(?:\s*(?:冷哼|揶揄|皱眉|瞪眼|点头|沉思|忽然|喃喃|低声|高声))?\s*(?:道|说|问|喝道|笑道|应道|喃喃)/);
+  // 仅当出现“姓名 + 叙述动词”时才返回说话人
+  const m = before.match(/([^\s，。、“”"！？：:]{1,6}).{0,6}?(?:冷哼|揶揄|皱眉|瞪眼|点头|沉思|喃喃|低声|高声)?\s*(?:道|说|问|喝道|喃喃|喊)/);
   if(m) return normalizeSpeaker(m[1], alias);
-  // “王捕头冷哼一声，揶揄道：”
-  const m2 = before.match(/([^\s，。、“”"！？：:]{1,6}).{0,6}道[：:]*$/);
-  if(m2) return normalizeSpeaker(m2[1], alias);
   return "";
 }
-function cleanNarr(s){ return s.replace(/^(?:他|她|众人)心里?想[道]?[：:]?/, ""); }
+function cleanNarr(s){
+  return s.replace(/^(?:他|她|众人)心里?想[道]?[：:]?/, "");
+}
 function endPause(s){
   for(let i=s.length-1;i>=0;i--){
     const ch = s[i];
@@ -276,25 +292,56 @@ function endPause(s){
   return 200;
 }
 function splitAndPush(out, speaker, content){
-  // 二次切句：避免超长
-  const parts = content.split(/([。！？!?])/).reduce((acc, cur, idx, arr)=>{
-    if(idx%2===0){
-      const p = cur + (arr[idx+1]||"");
-      if(p.trim()) acc.push(p.trim());
+  // 只按句号/问号/叹号切，避免把旁白切碎
+  const parts = content.split(/([。！？!?])/).reduce((acc, cur, i, arr)=>{
+    if(i%2===0){
+      const p = (cur + (arr[i+1]||"")).trim();
+      if(p) acc.push(p);
     }
     return acc;
   },[]);
   for(const p of parts){
-    out.push({speaker: speaker || "路人", text:p, style:"", pause:endPause(p)});
+    out.push({speaker: speaker || "路人", text:p, style:"", pause:endPause(p), gain:0});
   }
 }
+function narr(text){
+  return { speaker:"旁白", text: cleanNarr(text), style:"", pause:endPause(text), gain:0 };
+}
+function mergeConsecutiveNarration(arr, maxChars){
+  if(!arr.length) return arr;
+  const out = [];
+  let buf = null;
 
-/* ============ 渲染 ============ */
+  for(const it of arr){
+    if(it.speaker === "旁白"){
+      if(!buf){ buf = {...it}; }
+      else{
+        const merged = (buf.text ? buf.text + " " : "") + it.text;
+        if(merged.length <= maxChars){
+          buf.text  = merged;
+          buf.pause = it.pause; // 以最后一条的停顿为段尾停顿
+        }else{
+          out.push(buf);
+          buf = {...it};
+        }
+      }
+    }else{
+      if(buf){ out.push(buf); buf = null; }
+      out.push(it);
+    }
+  }
+  if(buf) out.push(buf);
+  return out;
+}
+
+/* ===================== 渲染 ===================== */
 function renderTable(){
   const tb = $("#scriptTbody");
   tb.innerHTML = "";
-  const roles = unique(items.map(x=>x.speaker));
+
+  const roles = [...new Set(items.map(x=>x.speaker))];
   roles.forEach((r, i)=> roleColors[r] = roleColors[r] || colorClasses[i % colorClasses.length]);
+
   let totalChars = 0;
   items.forEach((it, idx)=>{
     totalChars += it.text.length;
@@ -325,15 +372,16 @@ function renderTable(){
     `;
     tb.appendChild(tr);
   });
+
   $("#statInfo").textContent = `行数 ${items.length} · 总字数约 ${totalChars}`;
-  // 绑定编辑
+
   tb.querySelectorAll("input,textarea,select").forEach(el=>{
     el.addEventListener("input", e=>{
       const i = Number(e.target.getAttribute("data-i"));
       const k = e.target.getAttribute("data-k");
       if(k==="pause" || k==="gain"){ items[i][k] = Number(e.target.value); }
       else { items[i][k] = e.target.value; }
-      if(k==="speaker"){ renderRoles(); } // 角色变动时刷新统计与配色
+      if(k==="speaker"){ renderRoles(); }
     });
   });
 }
@@ -354,7 +402,7 @@ function renderRoles(){
   });
 }
 
-function unique(arr){ return Array.from(new Set(arr)); }
+/* ===================== 小工具 ===================== */
 function sel(v,k){ return v===k ? "selected" : ""; }
 function escapeHtml(s){ return s.replace(/[&<>"]/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m])); }
 </script>
